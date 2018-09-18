@@ -2,6 +2,8 @@ package org.terracotta.k8s.operator.app;
 
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
+import io.fabric8.kubernetes.api.model.ServiceAccount;
+import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.Config;
@@ -10,22 +12,25 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
 
-@RestController
-@RequestMapping("/api")
+import javax.validation.Valid;
+
+@Controller
 public class DeploymentController {
 
   private static final Logger log = LoggerFactory.getLogger(DeploymentController.class);
 
-  @PostMapping("/deployment/{connectionName}")
+  @PostMapping(value="/{connectionName}",  consumes = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
-  public void createDeployment() {
+  public void createDeployment(@PathVariable("connectionName") String connectionName, @RequestBody TerracottaClusterConfiguration terracottaClusterConfiguration) {
 
     Config config = new ConfigBuilder().build();
     try (KubernetesClient client = new DefaultKubernetesClient(config)) {
@@ -42,30 +47,30 @@ public class DeploymentController {
 //      for (int i = 0; i < 2; i++) {
 //        System.err.println("Iteration:" + (i + 1));
       Deployment deployment = new DeploymentBuilder()
-        .withNewMetadata()
-        .withName("terracotta")
-        .endMetadata()
-        .withNewSpec()
-        .withReplicas(1)
-        .withNewTemplate()
-        .withNewMetadata()
-        .addToLabels("app", "terracotta")
-        .endMetadata()
-        .withNewSpec()
-        .addNewContainer()
-        .withName("terracotta")
-        .withImage("terracotta/terracotta-server-oss")
-        .addNewPort()
-        .withContainerPort(9410)
-        .endPort()
-        .endContainer()
-        .endSpec()
-        .endTemplate()
-        .withNewSelector()
-        .addToMatchLabels("app", "terracotta")
-        .endSelector()
-        .endSpec()
-        .build();
+          .withNewMetadata()
+          .withName("terracotta")
+          .endMetadata()
+          .withNewSpec()
+          .withReplicas(1)
+          .withNewTemplate()
+          .withNewMetadata()
+          .addToLabels("app", "terracotta")
+          .endMetadata()
+          .withNewSpec()
+          .addNewContainer()
+          .withName("terracotta")
+          .withImage("terracotta/terracotta-server-oss")
+          .addNewPort()
+          .withContainerPort(9410)
+          .endPort()
+          .endContainer()
+          .endSpec()
+          .endTemplate()
+          .withNewSelector()
+          .addToMatchLabels("app", "terracotta")
+          .endSelector()
+          .endSpec()
+          .build();
 
 
       deployment = client.apps().deployments().inNamespace("thisisatest").create(deployment);
@@ -87,7 +92,7 @@ public class DeploymentController {
 
   }
 
-  @DeleteMapping("/deployment/{connectionName}")
+  @DeleteMapping("/{connectionName}")
   @ResponseBody
   public void deleteDeployment() {
 

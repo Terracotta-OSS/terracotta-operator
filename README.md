@@ -31,6 +31,32 @@ kubectl expose deployment operator --name=operator-port --type=NodePort
 you can checkout jib options to push to local docker instead :
     https://github.com/GoogleContainerTools/jib
 
+## Rest API
+
+```
+{
+  offheaps={
+    offheap1=256MB,
+    offheap2=100GB
+  },
+  dataroots={
+    dataroot1=EBS,
+    dataroot2=local
+  }
+  stripes=2,
+  serversPerStripe=2,
+  clientReconnectWindowSeconds=20
+}
+```
+    curl -X POST    http://localhost:8080/MyConnection
+
+
+```
+client.nodes().list().getItems().get(0).getMetadata().getLabels()
+client.nodes().list().getItems().get(0).getStatus().getCapacity().get("cpu").getAmount()
+client.nodes().list().getItems().get(0).getStatus().getCapacity().get("memory").getAmount()
+client.pods().inNamespace("default").list().getItems().stream().filter(pod -> pod.getSpec().getNodeName().equals("k8s-002")).collect(Collectors.toList())
+```
 
 ## Development
 
