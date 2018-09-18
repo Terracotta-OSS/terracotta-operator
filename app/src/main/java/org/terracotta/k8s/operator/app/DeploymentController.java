@@ -18,17 +18,20 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
 
 import javax.validation.Valid;
 
-@Controller
+@RestController
+@RequestMapping("/api")
 public class DeploymentController {
 
   private static final Logger log = LoggerFactory.getLogger(DeploymentController.class);
 
-  @PostMapping(value="/{connectionName}",  consumes = {MediaType.APPLICATION_JSON_VALUE})
+  @PostMapping(value="/deployment/{connectionName}",  consumes = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
   public void createDeployment(@PathVariable("connectionName") String connectionName, @RequestBody TerracottaClusterConfiguration terracottaClusterConfiguration) {
 
@@ -92,7 +95,7 @@ public class DeploymentController {
 
   }
 
-  @DeleteMapping("/{connectionName}")
+  @DeleteMapping("/deployment/{connectionName}")
   @ResponseBody
   public void deleteDeployment() {
 
