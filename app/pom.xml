@@ -37,6 +37,17 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+          <groupId>io.fabric8</groupId>
+          <artifactId>kubernetes-client</artifactId>
+          <version>4.0.3</version>
+        </dependency>
+        <dependency>
+          <groupId>io.kubernetes</groupId>
+          <artifactId>client-java</artifactId>
+          <version>3.0.0-beta2</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -49,8 +60,19 @@
                 <configuration>
                     <executable>true</executable>
                     <fork>true</fork>
-                    <mainClass>org.terracotta.k8s.operator.app.Main</mainClass>
+                    <mainClass>org.terracotta.k8s.operator.app.TerracottaOperatorApp</mainClass>
                 </configuration>
+            </plugin>
+            <plugin>
+              <groupId>com.google.cloud.tools</groupId>
+              <artifactId>jib-maven-plugin</artifactId>
+              <version>0.9.10</version>
+              <configuration>
+                <allowInsecureRegistries>true</allowInsecureRegistries>
+                <to>
+                  <image>terracotta/terracotta-operator</image>
+                </to>
+              </configuration>
             </plugin>
             <plugin>
                 <groupId>com.github.eirslett</groupId>
