@@ -119,6 +119,21 @@
                     </execution>
                 </executions>
             </plugin>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>com.google.cloud.tools</groupId>
+            <artifactId>jib-maven-plugin</artifactId>
+            <version>0.9.10</version>
+            <configuration>
+              <allowInsecureRegistries>true</allowInsecureRegistries>
+              <to>
+                <image>terracotta/terracotta-operator</image>
+              </to>
+            </configuration>
+          </plugin>
         </plugins>
     </build>
 

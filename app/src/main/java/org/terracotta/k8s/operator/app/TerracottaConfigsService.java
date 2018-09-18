@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -169,9 +170,26 @@ public class TerracottaConfigsService {
 
       ConfigMap configMap = new ConfigMapBuilder()
           .withNewMetadata()
-          .withName("paf")
+          .withName("tc-configs")
           .endMetadata()
           .withData(tcConfigs)
+          .build();
+
+
+      client.configMaps().inNamespace("thisisatest").createOrReplace(configMap);
+    }
+
+
+  }
+
+  public void createLicenseConfigMap(String license) {
+    try(KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
+
+      ConfigMap configMap = new ConfigMapBuilder()
+          .withNewMetadata()
+          .withName("license")
+          .endMetadata()
+          .withData(new HashMap<String, String>() {{put("license.xml",license);}})
           .build();
 
 
