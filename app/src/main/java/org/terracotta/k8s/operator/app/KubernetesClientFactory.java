@@ -1,4 +1,4 @@
-package org.terracotta.cloud.terracottaoperator;
+package org.terracotta.k8s.operator.app;
 
 
 import io.fabric8.kubernetes.client.Config;

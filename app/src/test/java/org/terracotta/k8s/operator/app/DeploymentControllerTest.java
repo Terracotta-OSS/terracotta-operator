@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 import org.springframework.web.context.WebApplicationContext;
 import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 @RunWith(SpringRunner.class)
@@ -37,14 +38,16 @@ public class DeploymentControllerTest {
   private WebApplicationContext webApplicationContext;
   @Autowired
   ObjectMapper objectMapper;
+  @Autowired
+  TerracottaConfigsService terracottaConfigsService;
 
-  @MockBean private org.terracotta.cloud.terracottaoperator.KubernetesClientFactory kubernetesClientFactory;
+//  @MockBean private KubernetesClientFactory kubernetesClientFactory;
 
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     KubernetesClient mockClient =  null;
-    when(kubernetesClientFactory.retrieveKubernetesClient()).thenReturn(mockClient);
+//    when(kubernetesClientFactory.retrieveKubernetesClient()).thenReturn(mockClient);
     this.mockMvc = webAppContextSetup(webApplicationContext).build();
   }
 
@@ -72,6 +75,30 @@ public class DeploymentControllerTest {
 
   }
 
+  @Test
+  public void createConfigMapTest() {
+    TerracottaClusterConfiguration clusterConfig = new TerracottaClusterConfiguration();
+    clusterConfig.setClientReconnectWindow(20);
+    clusterConfig.setServersPerStripe(2);
+    clusterConfig.setStripes(2);
+    clusterConfig.setDataroots(new TreeMap<String, String>() {{
+      put("dataroot1", "EBS");
+      put("dataroot2", "local");
+    }});
+
+    clusterConfig.setOffheaps(new TreeMap<String, String>() {{
+      put("offheap1", "100");
+      put("offheap2", "300");
+    }});
+
+
+    Map<String, String> tcConfigs = terracottaConfigsService.generateTerracottaConfigs(clusterConfig);
+    terracottaConfigsService.createStripesConfigMap(tcConfigs);
+
+
+
+
+  }
 
   @Test
   public void ingestTerracottaClusterConfiguration() throws Exception {
@@ -93,7 +120,7 @@ public class DeploymentControllerTest {
 
 
     // let's make sure it looks fine
-    mockMvc.perform(post("/MyCluster").content(newCluster).contentType(MediaType.APPLICATION_JSON))
+    mockMvc.perform(post("/api/deployment/MyCluster").content(newCluster).contentType(MediaType.APPLICATION_JSON))
         //.andDo(result -> println(result))
         .andExpect(status().isOk());
 

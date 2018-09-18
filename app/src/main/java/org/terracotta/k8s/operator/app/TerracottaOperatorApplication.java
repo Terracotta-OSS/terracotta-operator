@@ -2,19 +2,21 @@ package org.terracotta.k8s.operator.app;
 
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.terracotta.k8s.operator.shared.ServerStatus;
+import org.terracotta.k8s.operator.shared.ServerStatusResponse;
 
 import javax.annotation.PostConstruct;
 
 @SpringBootApplication
+@RequestMapping("/api")
 public class TerracottaOperatorApplication {
 
   private static final Logger log = LoggerFactory.getLogger(TerracottaOperatorApplication.class);
@@ -24,8 +26,14 @@ public class TerracottaOperatorApplication {
     SpringApplication.run(TerracottaOperatorApplication.class, args);
   }
 
+
+  @ResponseBody
+  public ServerStatusResponse status() {
+    return new ServerStatusResponse(ServerStatus.OK);
+  }
+
   @Autowired
-  private org.terracotta.cloud.terracottaoperator.KubernetesClientFactory kubernetesClientFactory;
+  private KubernetesClientFactory kubernetesClientFactory;
 
   @PostConstruct
   public void initApplication() {

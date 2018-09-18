@@ -40,6 +40,7 @@ you can checkout jib options to push to local docker instead :
     offheap2=100GB
   },
   dataroots={
+    PLATFORM=local
     dataroot1=EBS,
     dataroot2=local
   }
