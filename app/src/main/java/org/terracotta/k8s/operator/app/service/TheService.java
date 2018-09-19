@@ -1,4 +1,4 @@
-package org.terracotta.k8s.operator.app;
+package org.terracotta.k8s.operator.app.service;
 
 
 import io.fabric8.kubernetes.api.model.ConfigMap;
@@ -6,15 +6,15 @@ import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.terracotta.k8s.operator.app.KubernetesClientFactory;
 import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 @Service
-public class TerracottaConfigsService {
+public class TheService {
 
   @Autowired
   private KubernetesClientFactory kubernetesClientFactory;

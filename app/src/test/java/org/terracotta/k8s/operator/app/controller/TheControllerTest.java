@@ -1,28 +1,23 @@
-package org.terracotta.k8s.operator.app;
+package org.terracotta.k8s.operator.app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import org.springframework.web.context.WebApplicationContext;
 import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
+import org.terracotta.k8s.operator.app.service.TheService;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,7 +26,8 @@ import java.util.TreeMap;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 
-public class DeploymentControllerTest {
+@Ignore
+public class TheControllerTest {
 
   private MockMvc mockMvc;
   @Autowired
@@ -39,7 +35,7 @@ public class DeploymentControllerTest {
   @Autowired
   ObjectMapper objectMapper;
   @Autowired
-  TerracottaConfigsService terracottaConfigsService;
+  TheService theService;
 
 //  @MockBean private KubernetesClientFactory kubernetesClientFactory;
 
@@ -92,8 +88,8 @@ public class DeploymentControllerTest {
     }});
 
 
-    Map<String, String> tcConfigs = terracottaConfigsService.generateTerracottaConfigs(clusterConfig);
-    terracottaConfigsService.createStripesConfigMap(tcConfigs);
+    Map<String, String> tcConfigs = theService.generateTerracottaConfigs(clusterConfig);
+    theService.createStripesConfigMap(tcConfigs);
 
 
 

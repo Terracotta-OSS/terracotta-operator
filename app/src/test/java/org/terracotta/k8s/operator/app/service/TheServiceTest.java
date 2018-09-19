@@ -1,7 +1,7 @@
-package org.terracotta.k8s.operator.app;
+package org.terracotta.k8s.operator.app.service;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 import org.junit.Test;
 import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
 
@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class TerracottaConfigsServiceTest {
+public class TheServiceTest {
 
   @Test
   public void generateTerracottaConfigsTest() {
@@ -29,13 +29,13 @@ public class TerracottaConfigsServiceTest {
     }});
 
 
-    TerracottaConfigsService terracottaConfigsService =  new TerracottaConfigsService();
-    Map<String, String> tcConfigs = terracottaConfigsService.generateTerracottaConfigs(clusterConfig);
+    TheService theService =  new TheService();
+    Map<String, String> tcConfigs = theService.generateTerracottaConfigs(clusterConfig);
 
 
     assertThat(tcConfigs.keySet(),equalTo(new HashSet<String>() {{
-      add("terracotta-stripe-0.xml");
-      add("terracotta-stripe-1.xml");
+      add("stripe-0.xml");
+      add("stripe-1.xml");
     }}));
 
 
