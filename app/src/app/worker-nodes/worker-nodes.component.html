@@ -1,0 +1,9 @@
+<h2>Current Worker Nodes</h2><button (click)="getWorkerNodes()">Refresh</button>
+<ul class="workerNodes">
+  <li *ngFor="let workerNode of workerNodes">
+    <span class="badge">{{workerNode.cpuNumber}}</span>
+    <br/>{{workerNode.availableMemory}}
+    <br/>{{workerNode.labels}}
+    <br/>{{workerNode.podsCurrentlyRunning}}
+  </li>
+</ul>
