@@ -199,7 +199,20 @@ public class TheService {
 
   }
 
-  public void deleteLicenseConfigMap() {
+  public String readLicenseConfigMap() {
+    try(KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
+      ConfigMap configMap = client.configMaps()
+                                  .inNamespace("thisisatest")
+                                  .withName("license")
+                                  .get();
+      if (configMap != null) {
+        return configMap.getData().get("license.xml");
+      }
+      return null;
+    }
+  }
+
+  public boolean deleteLicenseConfigMap() {
     try(KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
 
       ConfigMap configMap = new ConfigMapBuilder()
@@ -208,9 +221,8 @@ public class TheService {
         .endMetadata()
         .build();
 
-      client.configMaps().inNamespace("thisisatest").delete(configMap);
+      return client.configMaps().inNamespace("thisisatest").delete(configMap);
     }
-
   }
 
 }

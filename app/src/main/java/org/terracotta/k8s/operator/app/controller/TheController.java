@@ -1,5 +1,7 @@
 package org.terracotta.k8s.operator.app.controller;
 
+import io.fabric8.kubernetes.api.model.ConfigMap;
+import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -11,6 +13,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,12 +23,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
 import org.terracotta.k8s.operator.app.service.TheService;
 
 import java.io.File;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")
@@ -38,23 +44,35 @@ public class TheController {
 
   @PutMapping(value="/config/license")
   @ResponseBody
-  public void createLicense(File licenseFile) {
-
-
+  public ResponseEntity<String> createLicense(@RequestParam(name="data") MultipartFile licenseFile) {
+    try {
+      theService.createLicenseConfigMap(new String(licenseFile.getBytes()));
+      return ResponseEntity.ok("License stored\n");
+    } catch (IOException e) {
+      return ResponseEntity.badRequest().body("Couldn't store license: " + e.getLocalizedMessage());
+    }
   }
 
   @GetMapping(value="/config/license")
   @ResponseBody
-  public ResponseEntity readLicense() {
-
-    return null;
+  public ResponseEntity<String> readLicense() {
+    String license = theService.readLicenseConfigMap();
+    if (license != null) {
+      return ResponseEntity.ok(license);
+    } else {
+      return ResponseEntity.badRequest().body("License not found\n");
+    }
   }
 
   @DeleteMapping(value="/config/license")
   @ResponseBody
-  public ResponseEntity deleteLicense() {
-    theService.deleteLicenseConfigMap();
-    return ResponseEntity.ok("");
+  public ResponseEntity<String> deleteLicense() {
+    boolean deleted = theService.deleteLicenseConfigMap();
+    if (deleted) {
+      return ResponseEntity.ok("Deleted the license\n");
+    } else {
+      return ResponseEntity.badRequest().body("License not found\n");
+    }
   }
 
 
