@@ -1,3 +1,4 @@
+import {SERVER_API_URL} from "../app.constants";
 import { Component, OnInit } from '@angular/core';
 import { WORKERNODES } from '../mock-workerNodes';
 import {WorkerNode} from "../model/workerNode";
@@ -20,7 +21,7 @@ export class WorkerNodesComponent implements OnInit {
   ngOnInit() {}
 
   getWorkerNodes() {
-    this.http.get<ClusterInfo>('http://localhost:8080/api/info').subscribe(workerNodes => this.workerNodes = workerNodes.workerNodes);
+    this.http.get<ClusterInfo>(SERVER_API_URL + '/api/info').subscribe(workerNodes => this.workerNodes = workerNodes.workerNodes);
   }
 
 }
