@@ -199,4 +199,18 @@ public class TheService {
 
   }
 
+  public void deleteLicenseConfigMap() {
+    try(KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
+
+      ConfigMap configMap = new ConfigMapBuilder()
+        .withNewMetadata()
+        .withName("license")
+        .endMetadata()
+        .build();
+
+      client.configMaps().inNamespace("thisisatest").delete(configMap);
+    }
+
+  }
+
 }

@@ -10,6 +10,7 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
+import org.terracotta.k8s.operator.app.service.TheService;
 
 import java.io.File;
 
@@ -31,6 +33,8 @@ public class TheController {
 
   private static final Logger log = LoggerFactory.getLogger(TheController.class);
 
+  @Autowired
+  private TheService theService;
 
   @PutMapping(value="/config/license")
   @ResponseBody
@@ -44,6 +48,13 @@ public class TheController {
   public ResponseEntity readLicense() {
 
     return null;
+  }
+
+  @DeleteMapping(value="/config/license")
+  @ResponseBody
+  public ResponseEntity deleteLicense() {
+    theService.deleteLicenseConfigMap();
+    return ResponseEntity.ok("");
   }
 
 
