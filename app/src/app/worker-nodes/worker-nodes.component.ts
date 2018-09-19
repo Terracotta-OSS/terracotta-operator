@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { WORKERNODES } from '../mock-workerNodes';
 import {WorkerNode} from "../model/workerNode";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
+import {ClusterInfo} from "../model/clusterInfo";
 
 @Component({
   selector: 'app-worker-nodes',
@@ -19,7 +20,7 @@ export class WorkerNodesComponent implements OnInit {
   ngOnInit() {}
 
   getWorkerNodes() {
-    this.http.get('http://localhost:8080/api/info').subscribe(workerNodes => this.workerNodes = workerNodes.workerNodes);
+    this.http.get<ClusterInfo>('http://localhost:8080/api/info').subscribe(workerNodes => this.workerNodes = workerNodes.workerNodes);
   }
 
 }
