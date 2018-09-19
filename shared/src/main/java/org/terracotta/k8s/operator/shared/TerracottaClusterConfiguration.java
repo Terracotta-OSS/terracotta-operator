@@ -1,4 +1,4 @@
-package org.terracotta.k8s.operator.app.model;
+package org.terracotta.k8s.operator.shared;
 
 import java.util.Map;
 import java.util.Objects;

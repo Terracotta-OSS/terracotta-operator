@@ -3,7 +3,7 @@ package org.terracotta.k8s.operator.app.service;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
+import org.terracotta.k8s.operator.shared.TerracottaClusterConfiguration;
 
 import java.util.HashSet;
 import java.util.Map;

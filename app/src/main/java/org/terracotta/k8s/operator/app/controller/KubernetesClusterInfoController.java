@@ -7,13 +7,12 @@ import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.terracotta.k8s.operator.app.model.KubernetesClusterInfo;
-import org.terracotta.k8s.operator.app.model.WorkerNode;
+import org.terracotta.k8s.operator.shared.ClusterInfo;
+import org.terracotta.k8s.operator.shared.WorkerNode;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,9 +25,9 @@ public class KubernetesClusterInfoController {
 
   @GetMapping("/info")
   @ResponseBody
-  public KubernetesClusterInfo retrieveClusterInfo () {
+  public ClusterInfo retrieveClusterInfo () {
 
-    KubernetesClusterInfo kubernetesClusterInfo = new KubernetesClusterInfo();
+    ClusterInfo kubernetesClusterInfo = new ClusterInfo();
 
 
     Config config = new ConfigBuilder().build();

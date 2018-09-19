@@ -1,10 +1,10 @@
-package org.terracotta.k8s.operator.app.model;
+package org.terracotta.k8s.operator.shared;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class KubernetesClusterInfo {
+public class ClusterInfo {
 
   private final List<WorkerNode> workerNodes =  new ArrayList<>();
 
@@ -21,7 +21,7 @@ public class KubernetesClusterInfo {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    KubernetesClusterInfo that = (KubernetesClusterInfo) o;
+    ClusterInfo that = (ClusterInfo) o;
     return Objects.equals(workerNodes, that.workerNodes);
   }
 

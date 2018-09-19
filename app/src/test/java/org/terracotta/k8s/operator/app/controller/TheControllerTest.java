@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import org.springframework.web.context.WebApplicationContext;
-import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
+import org.terracotta.k8s.operator.shared.TerracottaClusterConfiguration;
 import org.terracotta.k8s.operator.app.service.TheService;
 
 import java.util.Map;

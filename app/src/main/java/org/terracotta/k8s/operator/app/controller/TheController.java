@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,19 +13,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.terracotta.k8s.operator.app.NotFoundException;
 import org.terracotta.k8s.operator.app.TerracottaOperatorException;
-import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
+import org.terracotta.k8s.operator.shared.TerracottaClusterConfiguration;
 import org.terracotta.k8s.operator.app.service.TheService;
 
-import java.io.IOException;
+import java.util.Base64;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api")
 public class TheController {
 
@@ -35,13 +35,9 @@ public class TheController {
 
   @PutMapping(value = "/config/license")
   @ResponseBody
-  public ResponseEntity<String> createLicense(@RequestParam(name = "data") MultipartFile licenseFile) {
-    try {
-      theService.storeLicenseConfigMap(new String(licenseFile.getBytes()));
+  public ResponseEntity<String> createLicense(@RequestBody String licenseFile) {
+      theService.storeLicenseConfigMap(new String(Base64.getDecoder().decode(licenseFile)));
       return ResponseEntity.ok("License stored\n");
-    } catch (IOException e) {
-      return ResponseEntity.badRequest().body("Couldn't store license: " + e.getLocalizedMessage());
-    }
   }
 
   @GetMapping(value = "/config/license")

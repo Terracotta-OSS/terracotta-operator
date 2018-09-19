@@ -44,7 +44,7 @@ public class Main {
             try {
                 System.out.println();
                 System.out.println("1- Select server (do this first)");
-                System.out.println("2- Create cluster");
+                System.out.println("2- Get cluster info");
                 // Add more choices here
                 System.out.println("x- Exit");
 
@@ -55,7 +55,7 @@ public class Main {
                         selectServer();
                         break;
                     case "2":
-                        createCluster();
+                        getClusterInfo();
                     case "x":
                         return;
                     default:
@@ -67,8 +67,8 @@ public class Main {
         }
     }
 
-    private static void createCluster() {
-
+    private static void getClusterInfo() {
+      template.getForObject(server + "/api/status", ServerStatusResponse.class);
     }
 
     private static void selectServer() throws IOException {

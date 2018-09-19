@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.terracotta.k8s.operator.app.KubernetesClientFactory;
 import org.terracotta.k8s.operator.app.TerracottaOperatorException;
-import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
+import org.terracotta.k8s.operator.shared.TerracottaClusterConfiguration;
 
 import java.io.IOException;
 import java.util.ArrayList;
