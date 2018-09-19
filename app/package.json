@@ -46,5 +46,10 @@
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
     "typescript": "~2.9.2"
+  },
+  "scripts": {
+    "serve": "./ng serve --proxy-config proxy.conf.json",
+    "test": "./ng test",
+    "build": "./ng build"
   }
 }

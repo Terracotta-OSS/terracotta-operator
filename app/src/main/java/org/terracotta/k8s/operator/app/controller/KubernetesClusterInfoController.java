@@ -24,7 +24,6 @@ public class KubernetesClusterInfoController {
 
   private static final Logger log = LoggerFactory.getLogger(KubernetesClusterInfoController.class);
 
-  @CrossOrigin(origins = "http://localhost:4200")
   @GetMapping("/info")
   @ResponseBody
   public KubernetesClusterInfo retrieveClusterInfo () {
