@@ -1,22 +1,10 @@
 package org.terracotta.k8s.operator.app.controller;
 
-import io.fabric8.kubernetes.api.model.ConfigMap;
-import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
-import io.fabric8.kubernetes.api.model.Namespace;
-import io.fabric8.kubernetes.api.model.NamespaceBuilder;
-import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
-import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,15 +16,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.terracotta.k8s.operator.app.NotFoundException;
+import org.terracotta.k8s.operator.app.TerracottaOperatorException;
 import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
 import org.terracotta.k8s.operator.app.service.TheService;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
+import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api")
 public class TheController {
 
@@ -45,14 +33,18 @@ public class TheController {
   @Autowired
   private TheService theService;
 
-  @PutMapping(value="/config/license")
+  @PutMapping(value = "/config/license")
   @ResponseBody
-  public ResponseEntity<String> createLicense(@RequestBody String licenseFile) {
-      theService.createLicenseConfigMap(new String(Base64.getDecoder().decode(licenseFile)));
+  public ResponseEntity<String> createLicense(@RequestParam(name = "data") MultipartFile licenseFile) {
+    try {
+      theService.storeLicenseConfigMap(new String(licenseFile.getBytes()));
       return ResponseEntity.ok("License stored\n");
+    } catch (IOException e) {
+      return ResponseEntity.badRequest().body("Couldn't store license: " + e.getLocalizedMessage());
+    }
   }
 
-  @GetMapping(value="/config/license")
+  @GetMapping(value = "/config/license")
   @ResponseBody
   public ResponseEntity<String> readLicense() {
     String license = theService.readLicenseConfigMap();
@@ -63,10 +55,10 @@ public class TheController {
     }
   }
 
-  @DeleteMapping(value="/config/license")
+  @DeleteMapping(value = "/config/license")
   @ResponseBody
   public ResponseEntity<String> deleteLicense() {
-    boolean deleted = theService.deleteLicenseConfigMap();
+    boolean deleted = theService.deleteConfigMap("license");
     if (deleted) {
       return ResponseEntity.ok("Deleted the license\n");
     } else {
@@ -75,84 +67,53 @@ public class TheController {
   }
 
 
-
-  @PostMapping(value="/cluster/{connectionName}",  consumes = {MediaType.APPLICATION_JSON_VALUE})
+  @PostMapping(value = "/cluster/{clusterName}", consumes = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
-  public void createDeployment(@PathVariable("connectionName") String connectionName, @RequestBody TerracottaClusterConfiguration terracottaClusterConfiguration) {
+  public ResponseEntity createDeployment(@PathVariable("clusterName") String clusterName, @RequestBody TerracottaClusterConfiguration terracottaClusterConfiguration) {
 
-    Config config = new ConfigBuilder().build();
-    try (KubernetesClient client = new DefaultKubernetesClient(config)) {
-      // Create a namespace for all our stuff
-      Namespace ns = new NamespaceBuilder().withNewMetadata().withName("thisisatest").addToLabels("this", "rocks").endMetadata().build();
-      log.info("Created namespace : " + client.namespaces().createOrReplace(ns));
+    // check the license exists
+    theService.checkLicense();
 
+    // create the tc configs
+    Map<String, String> tcConfigs = theService.generateTerracottaConfigs(terracottaClusterConfiguration);
 
-      Deployment deployment = new DeploymentBuilder()
-          .withNewMetadata()
-          .withName("terracotta")
-          .endMetadata()
-          .withNewSpec()
-          .withReplicas(1)
-          .withNewTemplate()
-          .withNewMetadata()
-          .addToLabels("app", "terracotta")
-          .endMetadata()
-          .withNewSpec()
-          .addNewContainer()
-          .withName("terracotta")
-          .withImage("terracotta/terracotta-server-oss")
-          .addNewPort()
-          .withContainerPort(9410)
-          .endPort()
-          .endContainer()
-          .endSpec()
-          .endTemplate()
-          .withNewSelector()
-          .addToMatchLabels("app", "terracotta")
-          .endSelector()
-          .endSpec()
-          .build();
+    // store them in a configmap
+    theService.storeTcConfigsConfigMap(tcConfigs);
 
+    // store the terracottaClusterConfiguration in a configMap
+    theService.storeTerracottaClusterConfigurationConfigMap(clusterName, terracottaClusterConfiguration);
 
-      deployment = client.apps().deployments().inNamespace("thisisatest").create(deployment);
-      log.info("Created deployment : " + deployment);
+    // create the Terracotta Statefulsets
+    theService.createCluster(terracottaClusterConfiguration);
 
-//      System.err.println("Scaling up:" + deployment.getMetadata().getName());
-//      client.apps().deployments().inNamespace("thisisatest").withName("nginx").scale(2, true);
-//      log.info("Created replica sets:", client.apps().replicaSets().inNamespace("thisisatest").list().getItems());
-//				System.err.println("Deleting:" + deployment.getMetadata().getName());
-//				client.resource(deployment).delete();
-//      }
-//      log.info("Done.");
-
-
-//      Deployment deployment = client.apps().deployments().inNamespace("thisisatest").withName("nginx").get();
-//      log.info("Deleting:" + deployment.getMetadata().getName());
-//      client.resource(deployment).delete();
+    // configure the cluster with the cluster tool
+    if (!theService.configureCluster(clusterName, terracottaClusterConfiguration)) {
+      theService.deleteCluster(clusterName, terracottaClusterConfiguration);
+      throw new TerracottaOperatorException("Impossible to create the cluster");
     }
+
+    return ResponseEntity.ok(theService.constructTerracottaServerUrl(terracottaClusterConfiguration));
 
   }
 
-  @GetMapping("/cluster/{connectionName}")
+  @GetMapping("/cluster/{clusterName}")
   @ResponseBody
   public ResponseEntity listDeployment() {
     return null;
   }
 
-  @DeleteMapping("/cluster/{connectionName}")
+  @DeleteMapping("/cluster/{clusterName}")
   @ResponseBody
-  public void deleteDeployment() {
+  public void deleteDeployment(@PathVariable("clusterName") String clusterName) {
 
-    Config config = new ConfigBuilder().build();
-    try (KubernetesClient client = new DefaultKubernetesClient(config)) {
-      log.info("Deleting terracotta");
-      boolean deleted = client.apps().deployments().inNamespace("thisisatest").withName("terracotta").delete();
-      if(deleted) {
-        log.info("Successfully deleted terracotta");
-      } else {
-        log.warn("Could not delete terracotta");
-      }
+    // store the terracottaClusterConfiguration in a configMap
+    TerracottaClusterConfiguration terracottaClusterConfiguration = theService.retrieveTerracottaClusterConfigurationConfigMap(clusterName);
+    if (terracottaClusterConfiguration != null) {
+      theService.deleteCluster(clusterName, terracottaClusterConfiguration);
+    } else {
+      throw new NotFoundException();
     }
+
 
   }
 

@@ -89,7 +89,7 @@ public class TheControllerTest {
 
 
     Map<String, String> tcConfigs = theService.generateTerracottaConfigs(clusterConfig);
-    theService.createStripesConfigMap(tcConfigs);
+    theService.storeTcConfigsConfigMap(tcConfigs);
 
 
 

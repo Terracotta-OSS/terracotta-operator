@@ -41,7 +41,7 @@ When a new cluster is created, we'll persist the tc-configs in a ConfigMap (kube
     
     curl --header "Content-Type: application/json" \
       --request POST \
-      --data '{"offheaps":{"offheap1":"100MB","offheap2":"10GB"},"dataroots":{"dataroot1":"EBS","dataroot2":"local"},"stripes":2,"serversPerStripe":2,"clientReconnectWindow":20}' \
+      --data '{"offheaps":{"offheap1":"100MB","offheap2":"10GB"},"dataroots":{"PLATFORM":"local","dataroot1":"EBS","dataroot2":"local"},"stripes":2,"serversPerStripe":2,"clientReconnectWindow":20}' \
       http://localhost:8080/api/cluster/pif
 
     curl http://localhost:8080/api/cluster/pif
@@ -56,11 +56,11 @@ When a new cluster is created, we'll persist the tc-configs in a ConfigMap (kube
 
 When a license is uploaded, we'll persist it in a ConfigMap (kubernetes object) named license
 
-    curl -F ‘data=@path/to/license’ http://localhost:8080/api/license
+    curl -X PUT -F 'data=@/Users/adah/Downloads/TerracottaDB101.xml' http://localhost:8080/api/config/license
     
-    curl http://localhost:8080/api/license
+    curl http://localhost:8080/api/config/license
     
-    curl -X DELETE http://localhost:8080/api/license
+    curl -X DELETE http://localhost:8080/api/config/license
 
 ### get info about Kubernetes cluster
 
