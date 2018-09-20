@@ -44,8 +44,8 @@ public class TheController {
   @PutMapping(value = "/config/license")
   @ResponseBody
   public ResponseEntity<String> createLicense(@RequestBody String licenseFile) {
-      theService.storeLicenseConfigMap(new String(Base64.getDecoder().decode(licenseFile)));
-      return ResponseEntity.ok("License stored\n");
+    theService.storeLicenseConfigMap(new String(Base64.getDecoder().decode(licenseFile)));
+    return ResponseEntity.ok("License stored\n");
   }
 
   @GetMapping(value = "/config/license")

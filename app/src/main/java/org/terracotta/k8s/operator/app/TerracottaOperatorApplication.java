@@ -5,8 +5,6 @@ import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.internal.KubernetesDeserializer;
@@ -16,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.terracotta.k8s.operator.app.crd.DoneableLicense;
 import org.terracotta.k8s.operator.app.crd.DoneableTerracottaDBCluster;
 import org.terracotta.k8s.operator.app.crd.License;
@@ -24,8 +21,9 @@ import org.terracotta.k8s.operator.app.crd.LicenseList;
 import org.terracotta.k8s.operator.app.crd.TerracottaCRD;
 import org.terracotta.k8s.operator.app.crd.TerracottaDBCluster;
 import org.terracotta.k8s.operator.app.crd.TerracottaDBClusterList;
-import org.terracotta.k8s.operator.shared.ServerStatus;
-import org.terracotta.k8s.operator.shared.ServerStatusResponse;
+import org.terracotta.k8s.operator.app.service.TheService;
+import org.terracotta.k8s.operator.app.watcher.ClusterWatcher;
+import org.terracotta.k8s.operator.app.watcher.LicenseWatcher;
 
 import java.util.function.Predicate;
 
@@ -46,6 +44,9 @@ public class TerracottaOperatorApplication {
 
   @Autowired
   private KubernetesClientFactory kubernetesClientFactory;
+
+  @Autowired
+  private TheService theService;
 
   @PostConstruct
   public void initApplication() {
@@ -82,40 +83,14 @@ public class TerracottaOperatorApplication {
                                TerracottaDBCluster.class,
                                TerracottaDBClusterList.class,
                                DoneableTerracottaDBCluster.class).inNamespace(NAMESPACE);
-    clusterClient.watch(new Watcher<TerracottaDBCluster>() {
-      @Override
-      public void eventReceived(Action action, TerracottaDBCluster resource) {
-        if (Action.ADDED.equals(action)) {
-          log.info("Creating the cluster with name '{}'", resource.getMetadata().getName());
-        } else if (Action.DELETED.equals(action)) {
-          log.info("Destroying the cluster with name '{}'", resource.getMetadata().getName());
-        }
-      }
-
-      @Override
-      public void onClose(KubernetesClientException cause) {
-      }
-    });
+    clusterClient.watch(new ClusterWatcher(theService));
 
     NonNamespaceOperation<License, LicenseList, DoneableLicense, Resource<License, DoneableLicense>> licenseClient
       = client.customResources(TerracottaCRD.LICENSE_DEFINITION,
                                License.class,
                                LicenseList.class,
                                DoneableLicense.class).inNamespace(NAMESPACE);
-    licenseClient.watch(new Watcher<License>() {
-      @Override
-      public void eventReceived(Action action, License resource) {
-        if (Action.ADDED.equals(action)) {
-          log.info("Adding the license with name '{}'", resource.getMetadata().getName());
-        } else if (Action.DELETED.equals(action)) {
-          log.info("Deleting the license with name '{}'", resource.getMetadata().getName());
-        }
-      }
-
-      @Override
-      public void onClose(KubernetesClientException cause) {
-      }
-    });
+    licenseClient.watch(new LicenseWatcher(theService));
   }
 
   private static void createCRDIfNotExists(KubernetesClient kubernetesClient,

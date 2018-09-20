@@ -251,6 +251,15 @@ public class TheService {
     }
   }
 
+  public boolean configMapExists(String configMapName) {
+    try (KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
+      return  client.configMaps()
+                    .inNamespace("thisisatest")
+                    .withName(configMapName)
+                    .get() != null;
+    }
+  }
+
   public boolean deleteConfigMap(String configMapName) {
     try (KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
       ConfigMap configMap = new ConfigMapBuilder()
