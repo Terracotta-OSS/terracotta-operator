@@ -14,6 +14,8 @@ export class LicenseManagerComponent implements OnInit {
 
   loading: boolean = false;
 
+  licenseFile: string;
+
   @ViewChild('fileInput') fileInput: ElementRef;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
@@ -42,11 +44,22 @@ export class LicenseManagerComponent implements OnInit {
 
   onSubmit() {
     this.loading = true;
-    this.http.put(SERVER_API_URL + '/api/config/license', this.form.value.licenseFile).subscribe(resp => {this.loading = false;});
+    this.http.put(SERVER_API_URL + '/api/config/license', this.form.value.licenseFile, {responseType: 'text'}).subscribe(resp => {
+      this.loading = false;
+      this.showFile();
+    });
   }
 
   clearFile() {
     this.form.get('licenseFile').setValue(null);
     this.fileInput.nativeElement.value = '';
+  }
+
+  showFile() {
+    this.http.get(SERVER_API_URL + '/api/config/license', {responseType: 'text'}).subscribe(resp => { this.licenseFile = resp }, err => { this.licenseFile = '' });
+  }
+
+  deleteFile() {
+    this.http.delete(SERVER_API_URL + '/api/config/license', {responseType: 'text'}).subscribe(resp => { this.licenseFile = '' });
   }
 }
