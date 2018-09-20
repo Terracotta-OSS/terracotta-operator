@@ -296,6 +296,10 @@
   dependencies:
     "@types/jasmine" "*"
 
+"@types/jquery@^3.3.9":
+  version "3.3.9"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.9.tgz#91f2aaf5c1e91fd79598fc00ecb4504d78b51fd7"
+
 "@types/node@^6.0.46":
   version "6.0.117"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-6.0.117.tgz#ccfc2506001404708528d657aad9c1b931111646"

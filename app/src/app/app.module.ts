@@ -7,13 +7,15 @@ import { AppComponent } from './app.component';
 import { WorkerNodeComponent } from './worker-node/worker-node.component';
 import { WorkerNodesComponent } from './worker-nodes/worker-nodes.component';
 import { LicenseManagerComponent } from './license-manager/license-manager.component';
+import { ClusterManagerComponent } from './cluster-manager/cluster-manager.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     WorkerNodeComponent,
     WorkerNodesComponent,
-    LicenseManagerComponent
+    LicenseManagerComponent,
+    ClusterManagerComponent
   ],
   imports: [
     BrowserModule,

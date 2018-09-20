@@ -26,7 +26,7 @@ import java.util.Base64;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api")
 public class TheController {
 
@@ -70,7 +70,6 @@ public class TheController {
     }
   }
 
-
   @PostMapping(value = "/cluster/{clusterName}", consumes = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
   public ResponseEntity<String> createDeployment(@PathVariable("clusterName") String clusterName, @RequestBody TerracottaClusterConfiguration terracottaClusterConfiguration) {
@@ -102,8 +101,8 @@ public class TheController {
 
   @GetMapping("/cluster/{clusterName}")
   @ResponseBody
-  public ResponseEntity listDeployment() {
-    return null;
+  public TerracottaClusterConfiguration listDeployment(@PathVariable("clusterName") String clusterName) {
+    return theService.retrieveTerracottaClusterConfigurationConfigMap(clusterName);
   }
 
   @DeleteMapping("/cluster/{clusterName}")
