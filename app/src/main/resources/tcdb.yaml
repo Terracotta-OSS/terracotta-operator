@@ -1,7 +1,0 @@
-apiVersion: terracotta.com/v1
-kind: TCDB
-metadata:
- name: mycluster
-spec:
- stripe-count: 3
- nodes-per-stripes: 2
