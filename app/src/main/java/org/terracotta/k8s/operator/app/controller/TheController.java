@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,8 +33,10 @@ import org.terracotta.k8s.operator.app.service.TheService;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api")
 public class TheController {
 
@@ -44,13 +47,9 @@ public class TheController {
 
   @PutMapping(value="/config/license")
   @ResponseBody
-  public ResponseEntity<String> createLicense(@RequestParam(name="data") MultipartFile licenseFile) {
-    try {
-      theService.createLicenseConfigMap(new String(licenseFile.getBytes()));
+  public ResponseEntity<String> createLicense(@RequestBody String licenseFile) {
+      theService.createLicenseConfigMap(new String(Base64.getDecoder().decode(licenseFile)));
       return ResponseEntity.ok("License stored\n");
-    } catch (IOException e) {
-      return ResponseEntity.badRequest().body("Couldn't store license: " + e.getLocalizedMessage());
-    }
   }
 
   @GetMapping(value="/config/license")

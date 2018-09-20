@@ -12,7 +12,7 @@ import {ClusterInfo} from "../model/clusterInfo";
 })
 export class WorkerNodesComponent implements OnInit {
 
-  workerNodes = WORKERNODES;
+  workerNodes = [];
 
   constructor(private http: HttpClient) {
 
