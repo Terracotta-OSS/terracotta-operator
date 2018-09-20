@@ -1,7 +1,8 @@
 package org.terracotta.k8s.operator.app.crd;
 
 import io.fabric8.kubernetes.client.CustomResource;
-import org.terracotta.k8s.operator.app.model.TerracottaClusterConfiguration;
+
+import org.terracotta.k8s.operator.shared.TerracottaClusterConfiguration;
 
 public class TerracottaDBCluster extends CustomResource {
   private TerracottaClusterConfiguration spec;
