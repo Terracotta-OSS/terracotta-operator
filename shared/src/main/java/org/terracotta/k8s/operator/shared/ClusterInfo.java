@@ -8,7 +8,6 @@ public class ClusterInfo {
 
   private final List<WorkerNode> workerNodes =  new ArrayList<>();
 
-
   public void addWorkerNode(WorkerNode workerNode) {
     workerNodes.add(workerNode);
   }

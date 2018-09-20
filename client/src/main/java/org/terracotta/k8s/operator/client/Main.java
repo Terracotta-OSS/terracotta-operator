@@ -2,7 +2,9 @@ package org.terracotta.k8s.operator.client;
 
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.terracotta.k8s.operator.shared.ClusterInfo;
 import org.terracotta.k8s.operator.shared.ServerStatusResponse;
+import org.terracotta.k8s.operator.shared.WorkerNode;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,7 +70,15 @@ public class Main {
     }
 
     private static void getClusterInfo() {
-      template.getForObject(server + "/api/status", ServerStatusResponse.class);
+      ClusterInfo clusterInfo = template.getForObject(server + "/api/info", ClusterInfo.class);
+      for (int i = 0; i < clusterInfo.getWorkerNodes().size(); i++) {
+        WorkerNode node = clusterInfo.getWorkerNodes().get(i);
+        System.out.println("Node " + i);
+        System.out.println("  Memory: " + node.getAvailableMemory());
+        System.out.println("  CPU:    " + node.getCpuNumber());
+        System.out.println("  Labels: " + node.getLabels());
+        System.out.println("  Pods:   " + node.getPodsCurrentlyRunning());
+      }
     }
 
     private static void selectServer() throws IOException {

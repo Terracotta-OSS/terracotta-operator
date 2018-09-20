@@ -36,12 +36,6 @@ public class TerracottaOperatorApplication {
     SpringApplication.run(TerracottaOperatorApplication.class, args);
   }
 
-
-  @ResponseBody
-  public ServerStatusResponse status() {
-    return new ServerStatusResponse(ServerStatus.OK);
-  }
-
   @Autowired
   private KubernetesClientFactory kubernetesClientFactory;
 

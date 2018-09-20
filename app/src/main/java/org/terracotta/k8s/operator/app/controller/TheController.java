@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.terracotta.k8s.operator.app.NotFoundException;
 import org.terracotta.k8s.operator.app.TerracottaOperatorException;
+import org.terracotta.k8s.operator.shared.ServerStatus;
+import org.terracotta.k8s.operator.shared.ServerStatusResponse;
 import org.terracotta.k8s.operator.shared.TerracottaClusterConfiguration;
 import org.terracotta.k8s.operator.app.service.TheService;
 
@@ -32,6 +34,12 @@ public class TheController {
 
   @Autowired
   private TheService theService;
+
+  @GetMapping(value="/status")
+  @ResponseBody
+  public ServerStatusResponse status() {
+    return new ServerStatusResponse(ServerStatus.OK);
+  }
 
   @PutMapping(value = "/config/license")
   @ResponseBody
