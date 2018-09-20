@@ -1,5 +1,6 @@
 package org.terracotta.k8s.operator.shared;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -10,17 +11,17 @@ public class TerracottaClusterConfiguration {
 //        offheap1=256MB,
 //        offheap2=100GB
 //    },
-//        dataroots={
-//            dataroot1=EBS,
-//            dataroot2=local
-//        }
+//    dataroots={
+//        dataroot1=EBS,
+//        dataroot2=local
+//    },
 //    stripes=2,
-//        serversPerStripe=2,
-//        clientReconnectWindowSeconds=20
+//    serversPerStripe=2,
+//    clientReconnectWindowSeconds=20
 //  }
 
-  private Map<String, String> offheaps;
-  private Map<String, String> dataroots;
+  private Map<String, String> offheaps = new HashMap<>();
+  private Map<String, String> dataroots = new HashMap<>();
   private int stripes;
   private int serversPerStripe;
   private int clientReconnectWindow;

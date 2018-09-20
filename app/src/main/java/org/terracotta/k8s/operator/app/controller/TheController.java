@@ -73,7 +73,7 @@ public class TheController {
 
   @PostMapping(value = "/cluster/{clusterName}", consumes = {MediaType.APPLICATION_JSON_VALUE})
   @ResponseBody
-  public ResponseEntity createDeployment(@PathVariable("clusterName") String clusterName, @RequestBody TerracottaClusterConfiguration terracottaClusterConfiguration) {
+  public ResponseEntity<String> createDeployment(@PathVariable("clusterName") String clusterName, @RequestBody TerracottaClusterConfiguration terracottaClusterConfiguration) {
 
     // check the license exists
     theService.checkLicense();
