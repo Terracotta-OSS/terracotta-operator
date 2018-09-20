@@ -1,8 +1,16 @@
 package org.terracotta.k8s.operator.app;
 
+import com.google.gson.reflect.TypeToken;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
+import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinitionBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.kubernetes.client.ApiClient;
+import io.kubernetes.client.Configuration;
+import io.kubernetes.client.apis.CustomObjectsApi;
+import io.kubernetes.client.models.V1Namespace;
+import io.kubernetes.client.util.Config;
+import io.kubernetes.client.util.Watch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +22,8 @@ import org.terracotta.k8s.operator.shared.ServerStatus;
 import org.terracotta.k8s.operator.shared.ServerStatusResponse;
 
 import javax.annotation.PostConstruct;
+import java.util.HashSet;
+import java.util.Set;
 
 @SpringBootApplication
 @RequestMapping("/api")
@@ -50,9 +60,54 @@ public class TerracottaOperatorApplication {
 
         });
 
+
+        // Create custom resource definition of tcdb if not already exist.
+        if (client.customResourceDefinitions().list().getItems().stream().anyMatch(crd -> crd.getMetadata().getName().equals("tcdbs.terracotta.com"))) {
+          System.out.println("TCDB -- CRD already present");
+          return;
+        }
+
+        client.customResourceDefinitions().create(new CustomResourceDefinitionBuilder()
+          .withApiVersion("apiextensions.k8s.io/v1beta1")
+          .withNewMetadata().withName("tcdbs.terracotta.com").endMetadata()
+          .withNewSpec().withGroup("terracotta.com").withVersion("v1").withScope("Namespaced").withNewNames().withKind("TCDB").withShortNames("tcdb").withPlural("tcdbs").endNames().endSpec()
+          .build());
+
+        System.out.println("TCDB -- CRD created.");
       }
 
     }
   }
 
+  @PostConstruct
+  public void watchK8s()  {
+    Set<String> clusterNames = new HashSet<>();
+
+    new Thread(() -> {
+      System.out.println("Starting watcher thread to watch for TCDB creation...");
+
+      while (true) {
+        try {
+          ApiClient client = Config.defaultClient();
+          Configuration.setDefaultApiClient(client);
+
+          CustomObjectsApi api = new CustomObjectsApi();
+          Watch<V1Namespace> watch = Watch.createWatch(
+            client,
+            api.listNamespacedCustomObjectCall("terracotta.com", "v1", "thisisatest", "tcdbs", "tcdb", null, null, Boolean.TRUE, null, null),
+            new TypeToken<Watch.Response<V1Namespace>>() {
+            }.getType());
+
+          watch.forEach(item -> {
+            System.out.printf("%s : %s%n", item.type, item.object.getMetadata().getName());
+            if (!item.type.equals("ADDED") || clusterNames.contains(item.object.getMetadata().getName())) return;
+
+            System.out.println("starting cluster deployment....");
+          });
+        } catch (Exception e) {
+          System.out.println(e);
+        }
+      }
+    }).start();
+  }
 }
