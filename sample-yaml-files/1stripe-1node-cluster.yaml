@@ -1,0 +1,12 @@
+apiVersion: cluster.terracotta.com/v1
+kind: TerracottaDBCluster
+metadata:
+  name: cluster
+spec:
+  offheaps:
+    PLATFORM: 1G
+  dataroots:
+    dataroot2: local
+  stripes: 1
+  serversPerStripe: 1
+  clientReconnectWindow: 20

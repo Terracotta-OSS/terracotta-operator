@@ -6,16 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.EnvVarSourceBuilder;
-import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
 import io.fabric8.kubernetes.api.model.apps.StatefulSetBuilder;
 import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.kubernetes.client.Watch;
-import io.fabric8.kubernetes.client.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -399,11 +393,15 @@ public class TheService {
   }
 
   public void deleteCluster(String connectionName, TerracottaClusterConfiguration terracottaClusterConfiguration) {
-    try (KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
-      client.services().inNamespace("thisisatest").withName("tmc").delete();
-      client.apps().statefulSets().inNamespace("thisisatest").withName("tmc").delete();
-      client.batch().jobs().inNamespace("thisisatest").withName("cluster-tool").delete();
-    }
+
+    Thread deleteTMCThread =  new Thread(() -> {
+      try (KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
+        client.services().inNamespace("thisisatest").withName("tmc").delete();
+        client.apps().statefulSets().inNamespace("thisisatest").withName("tmc").delete();
+        client.batch().jobs().inNamespace("thisisatest").withName("cluster-tool").delete();
+      }
+    });
+    deleteTMCThread.start();
 
     IntStream.range(0, terracottaClusterConfiguration.getStripes()).parallel().forEach(stripeNumber -> {
       try (KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {

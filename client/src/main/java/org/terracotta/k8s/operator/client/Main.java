@@ -111,7 +111,7 @@ public class Main {
 
   private static void deleteDeployment() throws IOException {
     String clusterName = readString("Enter cluster name to delete:");
-    template.delete(server + "/api/config/license/{clusterName}", clusterName);
+    template.delete(server + "/api/cluster/{clusterName}", clusterName);
   }
 
   private static void createDeployment() throws IOException {
@@ -190,6 +190,8 @@ public class Main {
       System.out.println(choice + " (Y/n)");
       String value = readChoice();
       switch (value) {
+        // default value, Y being uppercase
+        case "":
         case "Y":
           return true;
         case "n":
