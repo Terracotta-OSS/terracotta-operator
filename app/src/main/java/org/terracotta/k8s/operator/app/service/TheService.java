@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.DoneableService;
 import io.fabric8.kubernetes.api.model.EnvVarSourceBuilder;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
 import io.fabric8.kubernetes.api.model.apps.StatefulSetBuilder;
@@ -14,6 +15,9 @@ import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.Watch;
+import io.fabric8.kubernetes.client.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -366,32 +372,28 @@ public class TheService {
       client.batch().jobs().inNamespace("thisisatest").create(clusterToolConfigureJob);
 
 
-      //waiting for the job to complete
-      // super cool except the event is never fired :-(
-//      final CountDownLatch watchLatch = new CountDownLatch(1);
-//      try (Watch watch = client.pods().inNamespace("thisisatest").withLabel("cluster-tool").watch(new Watcher<Pod>() {
-//        @Override
-//        public void eventReceived(Action action, Pod aPod) {
-//          if (aPod.getStatus().getPhase().equals("Succeeded")) {
-//            watchLatch.countDown();
-//          }
-//        }
-//
-//        @Override
-//        public void onClose(KubernetesClientException e) {
-//          // Ignore
-//        }
-//      })) {
-//        return watchLatch.await(2, TimeUnit.MINUTES);
-//      } catch (KubernetesClientException | InterruptedException e) {
-//        log.error("Could not watch pod", e);
-//      }
-//    } catch (KubernetesClientException exception) {
-//      log.error("An error occured while processing cronjobs:", exception.getMessage());
-//    }
+      final CountDownLatch watchLatch = new CountDownLatch(1);
+      try (Watch watch = client.pods().inNamespace("thisisatest").withLabel("job-name", "cluster-tool").watch(new Watcher<Pod>() {
+        @Override
+        public void eventReceived(Action action, Pod aPod) {
+          if (aPod.getStatus().getPhase().equals("Succeeded")) {
+            watchLatch.countDown();
+          }
+        }
+
+        @Override
+        public void onClose(KubernetesClientException e) {
+          // Ignore
+        }
+      })) {
+        return watchLatch.await(2, TimeUnit.MINUTES);
+      } catch (KubernetesClientException | InterruptedException e) {
+        log.error("Could not watch pod", e);
+      }
+    } catch (KubernetesClientException exception) {
+      log.error("An error occured while processing cronjobs:", exception.getMessage());
     }
     return true;
-
   }
 
   public void deleteCluster(String connectionName, TerracottaClusterConfiguration terracottaClusterConfiguration) {
