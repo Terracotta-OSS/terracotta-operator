@@ -145,7 +145,7 @@ public class Main {
     conf.setClientReconnectWindow(clientReconnectWindow);
 
     ResponseEntity<String> response = template.postForEntity(server + "/api/cluster/{clusterName}", conf, String.class, clusterName);
-    System.out.println("Terracotta server URL: " + response.getBody());
+    System.out.println("TMC URL: " + response.getBody());
   }
 
   private static void getClusterInfo() {

@@ -95,8 +95,15 @@ public class TheController {
       throw new TerracottaOperatorException("Impossible to create the cluster");
     }
 
-    return ResponseEntity.ok(theService.constructTerracottaServerUrl(terracottaClusterConfiguration));
 
+    return ResponseEntity.ok(theService.retrieveTmcUrl());
+
+  }
+
+  @GetMapping("/cluster/tmc")
+  @ResponseBody
+  public String tmcUrl() {
+    return theService.retrieveTmcUrl();
   }
 
   @GetMapping("/cluster/{clusterName}")

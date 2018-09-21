@@ -70,39 +70,40 @@ export class ClusterManagerComponent implements OnInit {
 
   assembleResourceMap() {
     const result = { offheaps: {}, dataroots: {}};
-    for (var i = 0; i < this.offheaps.nativeElement.childNodes.length; i++) {
-      const li = this.offheaps.nativeElement.childNodes[i];
+    Array.from(this.offheaps.nativeElement.childNodes).forEach(li => {
       let name;
       let value;
-      for (var j = 0; j < li.childNodes.length; j++) {
-        const child = li.childNodes[j];
+      // @ts-ignore
+      Array.from(li.children).forEach(child => {
+        // @ts-ignore
         if (child.className === 'name') {
+          // @ts-ignore
           name = child.value;
         } else {
+          // @ts-ignore
           value = child.value;
         }
-      }
-      if (name && value) {
-        result.offheaps[name] = value;
-      }
-    }
-
-    for (var i = 0; i < this.dataroots.nativeElement.childNodes.length; i++) {
-      const li = this.dataroots.nativeElement.childNodes[i];
+      })
+      result.offheaps[name] = value;
+    });
+    Array.from(this.dataroots.nativeElement.children).forEach(li => {
       let name;
       let value;
-      for (var j = 0; j < li.childNodes.length; j++) {
-        const child = li.childNodes[j];
+      // @ts-ignore
+      Array.from(li.children).forEach(child => {
+        // @ts-ignore
         if (child.className === 'name') {
+          // @ts-ignore
           name = child.value;
         } else {
+          // @ts-ignore
           value = child.value;
         }
-      }
+      })
       if (name && value) {
         result.dataroots[name] = value;
       }
-    }
+    });
     return result;
   }
 
@@ -124,11 +125,7 @@ export class ClusterManagerComponent implements OnInit {
     this.dataroots.nativeElement.appendChild(frag);
   }
 
-  removeOffheap() {
-    this.offheaps.nativeElement.removeChild(this.offheaps.nativeElement.lastElementChild);
-  }
+  removeResource() {
 
-  removeDataroot() {
-    this.dataroots.nativeElement.removeChild(this.dataroots.nativeElement.lastElementChild);
   }
 }

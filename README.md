@@ -2,7 +2,7 @@
 
 ## get started with local environement
 
-    mvn clean install -DskipTests
+    mvn clean install
 
 Then run the main method from your IDE; it should work
 
@@ -14,24 +14,45 @@ Then run the main method from your IDE; it should work
 
 
 ### build and publish it
-    mvn compile jib:dockerBuild
+ 
+    mvn -f app/pom.xml jib:dockerBuild
+
+
+
+    docker push terracotta/terracotta-operator
 
 you can checkout jib options to push to local docker instead :
     https://github.com/GoogleContainerTools/jib
 
 ### Required access (if needed)
+If you encounter :
 
 ```
-kubectl create rolebinding admin --clusterrole=admin --serviceaccount=default:default --namespace=default
-kubectl create rolebinding admin-test --clusterrole=admin --serviceaccount=default:default --namespace=thisisatest
-```
-
-### Run and expose the operator
+Message: Forbidden!Configured service account doesn't have access. Service account may have been revoked. namespaces "thisisatest" is forbidden: User "system:serviceaccount:default:default" cannot get namespaces in the namespace "thisisatest".
 
 ```
-kubectl run operator --image-pull-policy='Always' --image=terracotta/terracotta-operator --port=8080
-kubectl expose deployment operator --name=operator-port --type=NodePort
+
+Then apply this file :
+
 ```
+ kubectl apply -f sample-yaml-files/fabric8-rbac.yaml
+```
+
+### Run and expose the operatorT
+
+If on Minikube :
+```
+kubectl run terracotta-operator --image-pull-policy='Always' --image=terracotta/terracotta-operator --port=8080
+kubectl expose deployment terracotta-operator --name=terracotta-operator-port --type=NodePort
+minikube service terracotta-operator-port
+```
+
+If somewhere else : 
+```
+kubectl run terracotta-operator --image-pull-policy='Always' --image=terracotta/terracotta-operator --port=8080
+kubectl expose deployment terracotta-operator --name=operator-port --type=NodePort
+```
+
 
 ## Interact with the operator, via Rest
 
@@ -66,5 +87,18 @@ When a license is uploaded, we'll persist it in a ConfigMap (kubernetes object) 
 
     curl http://localhost:8080/api/info
 
+
+## Interact with the operator, via kubectl and CRDs
+
+    kubectl --namespace=thisisatest  apply -f sample-yaml-files/1stripe-1node-cluster.yaml
+    
+and delete : 
+
+    kubectl --namespace=thisisatest  delete -f sample-yaml-files/1stripe-1node-cluster.yaml
+
+
 ### few notes
+
+super slow to delete a statefulset...
+
 

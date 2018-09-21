@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
+import io.fabric8.kubernetes.api.model.DoneableService;
 import io.fabric8.kubernetes.api.model.EnvVarSourceBuilder;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
@@ -12,6 +13,7 @@ import io.fabric8.kubernetes.api.model.apps.StatefulSetBuilder;
 import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.dsl.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -396,17 +398,17 @@ public class TheService {
 
     Thread deleteTMCThread =  new Thread(() -> {
       try (KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
-        client.services().inNamespace("thisisatest").withName("tmc").delete();
-        client.apps().statefulSets().inNamespace("thisisatest").withName("tmc").delete();
-        client.batch().jobs().inNamespace("thisisatest").withName("cluster-tool").delete();
+        client.services().inNamespace("thisisatest").withName("tmc").withGracePeriod(0L).delete();
+        client.apps().statefulSets().inNamespace("thisisatest").withName("tmc").withGracePeriod(0L).delete();
+        client.batch().jobs().inNamespace("thisisatest").withName("cluster-tool").withGracePeriod(0L).delete();
       }
     });
     deleteTMCThread.start();
 
     IntStream.range(0, terracottaClusterConfiguration.getStripes()).parallel().forEach(stripeNumber -> {
       try (KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
-        client.services().inNamespace("thisisatest").withName("stripe-" + stripeNumber).delete();
-        client.apps().statefulSets().inNamespace("thisisatest").withName("terracotta-" + stripeNumber).delete();
+        client.services().inNamespace("thisisatest").withName("stripe-" + stripeNumber).withGracePeriod(0L).delete();
+        client.apps().statefulSets().inNamespace("thisisatest").withName("terracotta-" + stripeNumber).withGracePeriod(0L).delete();
       }
     });
 
@@ -592,6 +594,19 @@ public class TheService {
         }
       }
       return null;
+    }
+  }
+
+  public String retrieveTmcUrl() {
+    try (KubernetesClient client = kubernetesClientFactory.retrieveKubernetesClient()) {
+      Resource<io.fabric8.kubernetes.api.model.Service, DoneableService> tmcService = client.services().inNamespace("thisisatest").withName("tmc");
+      if (tmcService != null) {
+        int tmcPort = client.services().inNamespace("thisisatest").withName("tmc").get().getSpec().getPorts().get(0).getNodePort();
+        String hostName = client.nodes().list().getItems().get(0).getSpec().getExternalID();
+        return "http://" + hostName +":" + tmcPort;
+      } else {
+        return null;
+      }
     }
   }
 }
