@@ -4,9 +4,9 @@ metadata:
   name: cluster
 spec:
   offheaps:
-    PLATFORM: 1G
+    offheap1: 1GB
   dataroots:
-    dataroot2: local
+    PLATFORM: local
   stripes: 1
   serversPerStripe: 1
   clientReconnectWindow: 20
