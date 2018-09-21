@@ -70,32 +70,39 @@ export class ClusterManagerComponent implements OnInit {
 
   assembleResourceMap() {
     const result = { offheaps: {}, dataroots: {}};
-    Array.from(this.offheaps.nativeElement.childNodes).forEach(li => {
+    for (var i = 0; i < this.offheaps.nativeElement.childNodes.length; i++) {
+      const li = this.offheaps.nativeElement.childNodes[i];
       let name;
       let value;
-      Array.from(li.children).forEach(child => {
+      for (var j = 0; j < li.childNodes.length; j++) {
+        const child = li.childNodes[j];
         if (child.className === 'name') {
           name = child.value;
         } else {
           value = child.value;
         }
-      })
-      result.offheaps[name] = value;
-    });
-    Array.from(this.dataroots.nativeElement.children).forEach(li => {
+      }
+      if (name && value) {
+        result.offheaps[name] = value;
+      }
+    }
+
+    for (var i = 0; i < this.dataroots.nativeElement.childNodes.length; i++) {
+      const li = this.dataroots.nativeElement.childNodes[i];
       let name;
       let value;
-      Array.from(li.children).forEach(child => {
+      for (var j = 0; j < li.childNodes.length; j++) {
+        const child = li.childNodes[j];
         if (child.className === 'name') {
           name = child.value;
         } else {
           value = child.value;
         }
-      })
+      }
       if (name && value) {
         result.dataroots[name] = value;
       }
-    });
+    }
     return result;
   }
 
@@ -117,7 +124,11 @@ export class ClusterManagerComponent implements OnInit {
     this.dataroots.nativeElement.appendChild(frag);
   }
 
-  removeResource() {
+  removeOffheap() {
+    this.offheaps.nativeElement.removeChild(this.offheaps.nativeElement.lastElementChild);
+  }
 
+  removeDataroot() {
+    this.dataroots.nativeElement.removeChild(this.dataroots.nativeElement.lastElementChild);
   }
 }

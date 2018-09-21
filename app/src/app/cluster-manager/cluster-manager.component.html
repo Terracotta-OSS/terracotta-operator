@@ -11,9 +11,11 @@
     <ul class="offheaps" #offheaps>
     </ul>
     <button type="button" class="btn btn-sm btn-default" (click)="addOffheap()">Add</button>
+    <button type="button" class="btn btn-sm btn-default" (click)="removeOffheap()">Remove</button>
     <ul class="dataroots" #dataroots>
     </ul>
     <button type="button" class="btn btn-sm btn-default" (click)="addDataroot()">Add</button>
+    <button type="button" class="btn btn-sm btn-default" (click)="removeDataroot()">Remove</button>
   </div>
   <button type="submit" [disabled]="form.invalid || loading" class="btn btn-success">Create Cluster <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loading"></i></button>
   <button type="button" (click)="removeCluster()" [disabled]="form.invalid || loading" class="btn btn-failure">Remove Cluster <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loading"></i></button>
