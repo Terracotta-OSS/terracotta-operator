@@ -7,6 +7,5 @@ spec:
     offheap1: 1GB
   dataroots:
     PLATFORM: local
-  stripes: 1
   serversPerStripe: 1
   clientReconnectWindow: 20

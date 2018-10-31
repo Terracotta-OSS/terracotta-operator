@@ -17,11 +17,6 @@ public class TheServiceTest {
     TerracottaClusterConfiguration clusterConfig = new TerracottaClusterConfiguration();
     clusterConfig.setClientReconnectWindow(20);
     clusterConfig.setServersPerStripe(2);
-    clusterConfig.setStripes(2);
-    clusterConfig.setDataroots(new TreeMap<String, String>() {{
-      put("dataroot1", "EBS");
-      put("dataroot2", "local");
-    }});
 
     clusterConfig.setOffheaps(new TreeMap<String, String>() {{
       put("offheap1", "100");
@@ -30,7 +25,7 @@ public class TheServiceTest {
 
 
     TheService theService =  new TheService();
-    Map<String, String> tcConfigs = theService.generateTerracottaConfigs(clusterConfig);
+    Map<String, String> tcConfigs = theService.generateTerracottaConfig(clusterConfig);
 
 
     assertThat(tcConfigs.keySet(),equalTo(new HashSet<String>() {{
@@ -56,11 +51,6 @@ public class TheServiceTest {
     TerracottaClusterConfiguration clusterConfig = new TerracottaClusterConfiguration();
     clusterConfig.setClientReconnectWindow(20);
     clusterConfig.setServersPerStripe(2);
-    clusterConfig.setStripes(2);
-    clusterConfig.setDataroots(new TreeMap<String, String>() {{
-      put("dataroot1", "EBS");
-      put("dataroot2", "local");
-    }});
 
     clusterConfig.setOffheaps(new TreeMap<String, String>() {{
       put("offheap1", "100");
@@ -70,6 +60,6 @@ public class TheServiceTest {
 
     TheService theService =  new TheService();
     String terracottaServerUrl = theService.constructTerracottaServerUrl(clusterConfig);
-    assertThat(terracottaServerUrl, equalTo("terracotta://terracotta-0-0.stripe-0:9410,terracotta-0-1.stripe-0:9410,terracotta-1-0.stripe-1:9410,terracotta-1-1.stripe-1:9410"));
+    assertThat(terracottaServerUrl, equalTo("terracotta://terracotta-0-0.stripe-0:9410,terracotta-0-1.stripe-0:9410"));
   }
 }

@@ -10,19 +10,12 @@ public class TerracottaClusterConfiguration {
 //    offheaps={
 //        offheap1=256MB,
 //        offheap2=100GB
-//    },
-//    dataroots={
-//        dataroot1=EBS,
-//        dataroot2=local
-//    },
-//    stripes=2,
+//    }
 //    serversPerStripe=2,
 //    clientReconnectWindowSeconds=20
 //  }
 
   private Map<String, String> offheaps = new HashMap<>();
-  private Map<String, String> dataroots = new HashMap<>();
-  private int stripes;
   private int serversPerStripe;
   private int clientReconnectWindow;
 
@@ -32,22 +25,6 @@ public class TerracottaClusterConfiguration {
 
   public void setOffheaps(Map<String, String> offheaps) {
     this.offheaps = offheaps;
-  }
-
-  public Map<String, String> getDataroots() {
-    return dataroots;
-  }
-
-  public void setDataroots(Map<String, String> dataroots) {
-    this.dataroots = dataroots;
-  }
-
-  public int getStripes() {
-    return stripes;
-  }
-
-  public void setStripes(int stripes) {
-    this.stripes = stripes;
   }
 
   public int getServersPerStripe() {
@@ -71,26 +48,13 @@ public class TerracottaClusterConfiguration {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     TerracottaClusterConfiguration that = (TerracottaClusterConfiguration) o;
-    return stripes == that.stripes &&
-        serversPerStripe == that.serversPerStripe &&
-        clientReconnectWindow == that.clientReconnectWindow &&
-        Objects.equals(offheaps, that.offheaps) &&
-        Objects.equals(dataroots, that.dataroots);
+    return serversPerStripe == that.serversPerStripe &&
+      clientReconnectWindow == that.clientReconnectWindow &&
+      Objects.equals(offheaps, that.offheaps);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(offheaps, dataroots, stripes, serversPerStripe, clientReconnectWindow);
-  }
-
-  @Override
-  public String toString() {
-    return "TerracottaClusterConfiguration{" +
-           "offheaps=" + offheaps +
-           ", dataroots=" + dataroots +
-           ", stripes=" + stripes +
-           ", serversPerStripe=" + serversPerStripe +
-           ", clientReconnectWindow=" + clientReconnectWindow +
-           '}';
+    return Objects.hash(offheaps, serversPerStripe, clientReconnectWindow);
   }
 }

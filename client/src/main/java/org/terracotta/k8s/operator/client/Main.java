@@ -127,20 +127,9 @@ public class Main {
       conf.getOffheaps().put(name, size);
     }
 
-    while(true) {
-      if(!readBoolean("Do you want to add dataroots?")) {
-        break;
-      }
-      String name = readString("Dataroot name: ");
-      String path = readString("Dataroot path: ");
-      conf.getDataroots().put(name, path);
-    }
-
-    int stripes = readInteger("How many stripes to you want: ");
-    int serversPerStripe = readInteger("How many servers per stripe: ");
+    int serversPerStripe = readInteger("How many servers : ");
     int clientReconnectWindow = readInteger("What is the client reconnect window (in seconds): ");
 
-    conf.setStripes(stripes);
     conf.setServersPerStripe(serversPerStripe);
     conf.setClientReconnectWindow(clientReconnectWindow);
 

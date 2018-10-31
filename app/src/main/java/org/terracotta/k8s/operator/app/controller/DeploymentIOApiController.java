@@ -11,6 +11,7 @@ import io.kubernetes.client.models.V1Status;
 import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,9 @@ import java.io.IOException;
 public class DeploymentIOApiController {
 
   private static final Logger log = LoggerFactory.getLogger(DeploymentIOApiController.class);
+
+  @Value("${application.namespace}")
+  String namespace;
 
   @PostMapping("/io/{connectionName}")
   @ResponseBody
@@ -60,7 +64,7 @@ public class DeploymentIOApiController {
       .endSpec()
       .build();
 
-    V1Deployment thisisatest = api.createNamespacedDeployment("thisisatest", v1Deployment, null, "true", "false");
+    api.createNamespacedDeployment(namespace, v1Deployment, null, "true", "false");
     log.info("Created deployment : " + v1Deployment);
   }
 
@@ -72,10 +76,9 @@ public class DeploymentIOApiController {
     Configuration.setDefaultApiClient(client);
 
     AppsV1Api api = new AppsV1Api();
-//    api.listNamespacedDeployment ("thisisatest", null, null, null, false, null, 0, null, 0, false);
     log.info("Deleting terracotta");
 
-    V1Status v1Status = api.deleteNamespacedDeployment("terracotta", "thisisatest", new V1DeleteOptions(), "true", "false", 0, false, null);
+    V1Status v1Status = api.deleteNamespacedDeployment("terracotta", namespace, new V1DeleteOptions(), "true", "false", 0, false, null);
 
     System.out.println(v1Status);
 

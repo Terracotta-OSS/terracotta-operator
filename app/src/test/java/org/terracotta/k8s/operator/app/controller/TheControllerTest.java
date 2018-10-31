@@ -52,10 +52,6 @@ public class TheControllerTest {
 
     TerracottaClusterConfiguration value = new TerracottaClusterConfiguration();
     value.setClientReconnectWindow(20);
-    value.setDataroots(new TreeMap<String, String>() {{
-      put("dataroot1", "EBS");
-      put("dataroot2", "local");
-    }});
 
     value.setOffheaps(new TreeMap<String, String>() {{
       put("offheap1", "100MB");
@@ -76,11 +72,6 @@ public class TheControllerTest {
     TerracottaClusterConfiguration clusterConfig = new TerracottaClusterConfiguration();
     clusterConfig.setClientReconnectWindow(20);
     clusterConfig.setServersPerStripe(2);
-    clusterConfig.setStripes(2);
-    clusterConfig.setDataroots(new TreeMap<String, String>() {{
-      put("dataroot1", "EBS");
-      put("dataroot2", "local");
-    }});
 
     clusterConfig.setOffheaps(new TreeMap<String, String>() {{
       put("offheap1", "100");
@@ -88,8 +79,8 @@ public class TheControllerTest {
     }});
 
 
-    Map<String, String> tcConfigs = theService.generateTerracottaConfigs(clusterConfig);
-    theService.storeTcConfigsConfigMap(tcConfigs);
+    Map<String, String> tcConfigs = theService.generateTerracottaConfig(clusterConfig);
+    theService.storeTcConfigConfigMap(tcConfigs);
 
 
 
@@ -105,11 +96,6 @@ public class TheControllerTest {
         "    \"offheap1\": \"256MB\",\n" +
         "    \"offheap2\": \"100GB\"\n" +
         "  },\n" +
-        "  \"dataroots\": {\n" +
-        "    \"dataroot1\": \"EBS\",\n" +
-        "    \"dataroot2\": \"local\"\n" +
-        "  },\n" +
-        "  \"stripes\": 2,\n" +
         "  \"serversPerStripe\": 2,\n" +
         "  \"clientReconnectWindowSeconds\": 20\n" +
         "}";

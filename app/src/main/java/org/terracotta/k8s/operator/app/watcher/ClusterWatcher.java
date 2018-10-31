@@ -37,31 +37,25 @@ public class ClusterWatcher implements Watcher<TerracottaDBCluster> {
       theService.checkLicense();
 
       // create the tc configs
-      Map<String, String> tcConfigs = theService.generateTerracottaConfigs(terracottaClusterConfiguration);
+      Map<String, String> tcConfigs = theService.generateTerracottaConfig(terracottaClusterConfiguration);
 
       // store them in a configmap
-      theService.storeTcConfigsConfigMap(tcConfigs);
+      theService.storeTcConfigConfigMap(tcConfigs);
 
       // store the terracottaClusterConfiguration in a configMap
-      theService.storeTerracottaClusterConfigurationConfigMap(clusterName, terracottaClusterConfiguration);
+      theService.storeTerracottaClusterConfigurationConfigMap(terracottaClusterConfiguration);
 
       // create the Terracotta Statefulsets
       theService.createCluster(terracottaClusterConfiguration);
 
-      // configure the cluster with the cluster tool
-      if (!theService.configureCluster(clusterName, terracottaClusterConfiguration)) {
-        theService.deleteCluster(clusterName, terracottaClusterConfiguration);
-        LOGGER.error("Couldn't create cluster with name '{}' and configuration '{}'", clusterName, terracottaClusterConfiguration);
-        return;
-      }
       LOGGER.info("Successfully started the cluster with name '{}' and configuration '{}'",
                   clusterName,
                   terracottaClusterConfiguration);
     } else if (Action.DELETED.equals(action)) {
       LOGGER.info("Deleting the cluster with name '{}'", clusterName);
-      TerracottaClusterConfiguration terracottaClusterConfiguration = theService.retrieveTerracottaClusterConfigurationConfigMap(clusterName);
+      TerracottaClusterConfiguration terracottaClusterConfiguration = theService.retrieveTerracottaClusterConfigurationConfigMap();
       if (terracottaClusterConfiguration != null) {
-        theService.deleteCluster(clusterName, terracottaClusterConfiguration);
+        theService.deleteCluster();
       } else {
         LOGGER.error("No cluster found with name '{}'", clusterName);
       }
