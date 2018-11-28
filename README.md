@@ -38,7 +38,7 @@ Then apply this file :
  kubectl apply -f sample-yaml-files/fabric8-rbac.yaml
 ```
 
-### Run and expose the operatorT
+### Run and expose the operator
 
 If on Minikube :
 ```

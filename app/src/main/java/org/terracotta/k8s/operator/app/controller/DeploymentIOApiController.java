@@ -60,7 +60,7 @@ public class DeploymentIOApiController {
       .endSpec()
       .build();
 
-    V1Deployment thisisatest = api.createNamespacedDeployment("thisisatest", v1Deployment, null);
+    V1Deployment thisisatest = api.createNamespacedDeployment("thisisatest", v1Deployment, null, "true", "false");
     log.info("Created deployment : " + v1Deployment);
   }
 
@@ -75,7 +75,7 @@ public class DeploymentIOApiController {
 //    api.listNamespacedDeployment ("thisisatest", null, null, null, false, null, 0, null, 0, false);
     log.info("Deleting terracotta");
 
-    V1Status v1Status = api.deleteNamespacedDeployment("terracotta", "thisisatest", new V1DeleteOptions(), null, 0, false, null);
+    V1Status v1Status = api.deleteNamespacedDeployment("terracotta", "thisisatest", new V1DeleteOptions(), "true", "false", 0, false, null);
 
     System.out.println(v1Status);
 

@@ -15,7 +15,7 @@
     <maven.version>2.0</maven.version>
     <node.version>v8.9.4</node.version>
     <yarn.version>v1.3.2</yarn.version>
-    <spring-boot.version>2.0.5.RELEASE</spring-boot.version>
+    <spring-boot.version>2.1.0.RELEASE</spring-boot.version>
   </properties>
 
   <dependencyManagement>
