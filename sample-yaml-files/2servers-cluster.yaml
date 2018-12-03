@@ -1,0 +1,10 @@
+apiVersion: terracotta.org/v1
+kind: TerracottaOSSCluster
+metadata:
+  name: mycluster
+spec:
+  offheaps:
+    offheap1: 1GB
+    offheap2: 1GB
+  serversPerStripe: 2
+  clientReconnectWindow: 20

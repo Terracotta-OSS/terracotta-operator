@@ -4,7 +4,7 @@ import io.fabric8.kubernetes.client.CustomResource;
 
 import org.terracotta.k8s.operator.shared.TerracottaClusterConfiguration;
 
-public class TerracottaDBCluster extends CustomResource {
+public class TerracottaOSSCluster extends CustomResource {
   private TerracottaClusterConfiguration spec;
 
   public TerracottaClusterConfiguration getSpec() {
@@ -17,7 +17,7 @@ public class TerracottaDBCluster extends CustomResource {
 
   @Override
   public String toString() {
-    return "TerracottaDBCluster{" +
+    return "TerracottaOSSCluster{" +
            "spec=" + spec +
            '}';
   }

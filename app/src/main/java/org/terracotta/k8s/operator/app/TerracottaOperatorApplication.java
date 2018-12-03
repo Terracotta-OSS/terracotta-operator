@@ -17,7 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.terracotta.k8s.operator.app.crd.DoneableTerracottaDBCluster;
 import org.terracotta.k8s.operator.app.crd.TerracottaCRD;
-import org.terracotta.k8s.operator.app.crd.TerracottaDBCluster;
+import org.terracotta.k8s.operator.app.crd.TerracottaOSSCluster;
 import org.terracotta.k8s.operator.app.crd.TerracottaDBClusterList;
 import org.terracotta.k8s.operator.app.service.TheService;
 import org.terracotta.k8s.operator.app.watcher.ClusterWatcher;
@@ -51,13 +51,6 @@ public class TerracottaOperatorApplication {
       Namespace ns = new NamespaceBuilder().withNewMetadata().withName(namespace).endMetadata().build();
       if (client != null) {
         log.info("Created or replaced namespace : " + client.namespaces().createOrReplace(ns));
-
-//        client.apps().deployments().inNamespace(namespace).list().getItems().forEach(deployment -> {
-//          log.warn("Found this deployment : " + deployment);
-//          client.apps().deployments().inNamespace(namespace).withName(deployment.getMetadata().getName()).delete();
-//          log.warn("Deleted this deployment : " + deployment);
-//        });
-
         startTerracottaCRDWatcher(client);
       }
     }
@@ -66,12 +59,12 @@ public class TerracottaOperatorApplication {
   private void startTerracottaCRDWatcher(KubernetesClient client) {
     createCRDIfNotExists(client, TerracottaCRD.CLUSTER_DEFINITION, TerracottaCRD.CLUSTER_FULL_NAME::equals);
     // Fixing a fabric8 bug
-    KubernetesDeserializer.registerCustomKind(TerracottaCRD.TERRACOTTA_GROUP + "/v1",
+    KubernetesDeserializer.registerCustomKind(TerracottaCRD.TERRACOTTA_GROUP + "/" + TerracottaCRD.VERSION,
                                               TerracottaCRD.CLUSTER_SINGULAR_NAME,
-                                              TerracottaDBCluster.class);
-    NonNamespaceOperation<TerracottaDBCluster, TerracottaDBClusterList, DoneableTerracottaDBCluster, Resource<TerracottaDBCluster, DoneableTerracottaDBCluster>> clusterClient
+                                              TerracottaOSSCluster.class);
+    NonNamespaceOperation<TerracottaOSSCluster, TerracottaDBClusterList, DoneableTerracottaDBCluster, Resource<TerracottaOSSCluster, DoneableTerracottaDBCluster>> clusterClient
       = client.customResources(TerracottaCRD.CLUSTER_DEFINITION,
-                               TerracottaDBCluster.class,
+                               TerracottaOSSCluster.class,
                                TerracottaDBClusterList.class,
                                DoneableTerracottaDBCluster.class).inNamespace(namespace);
     clusterClient.watch(new ClusterWatcher(theService));

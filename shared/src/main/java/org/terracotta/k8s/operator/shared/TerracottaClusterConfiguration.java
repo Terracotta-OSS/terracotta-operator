@@ -57,4 +57,13 @@ public class TerracottaClusterConfiguration {
   public int hashCode() {
     return Objects.hash(offheaps, serversPerStripe, clientReconnectWindow);
   }
+
+  @Override
+  public String toString() {
+    return "TerracottaClusterConfiguration{" +
+      "offheaps=" + offheaps +
+      ", serversPerStripe=" + serversPerStripe +
+      ", clientReconnectWindow=" + clientReconnectWindow +
+      '}';
+  }
 }

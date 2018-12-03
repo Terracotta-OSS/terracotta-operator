@@ -4,7 +4,7 @@
 
     mvn clean install
 
-Then run the main method from your IDE; it should work
+Then run the main method from your IDE or run with maven spring-boot:run
 
 ### Upgrade plugin versions
 
@@ -17,12 +17,7 @@ Then run the main method from your IDE; it should work
  
     mvn -f app/pom.xml jib:dockerBuild
 
-
-
     docker push terracotta/terracotta-operator
-
-you can checkout jib options to push to local docker instead :
-    https://github.com/GoogleContainerTools/jib
 
 ### Required access (if needed)
 If you encounter :
@@ -56,45 +51,31 @@ kubectl expose deployment terracotta-operator --name=operator-port --type=NodePo
 
 ## Interact with the operator, via Rest
 
-### create a new cluster named `pif` , list it, delete it
+### create a new cluster, list it, delete it
 
-When a new cluster is created, we'll persist the tc-configs in a ConfigMap (kubernetes object) named tc-configs
+To create a new cluster:
     
     curl --header "Content-Type: application/json" \
       --request POST \
-      --data '{"offheaps":{"offheap1":"100MB","offheap2":"10GB"},"dataroots":{"PLATFORM":"local","dataroot1":"EBS","dataroot2":"local"},"stripes":2,"serversPerStripe":2,"clientReconnectWindow":20}' \
-      http://localhost:8080/api/cluster/pif
+      --data '{"offheaps":{"offheap1":"100MB","offheap2":"1GB"},"serversPerStripe":2,"clientReconnectWindow":20}' \
+      http://localhost:8080/api/cluster
 
-    curl http://localhost:8080/api/cluster/pif
-    
-    # or list all known clusters (1 MAX for now)
+Check the status of the cluster: 
+
     curl http://localhost:8080/api/cluster
-
-    curl -X DELETE http://localhost:8080/api/cluster/pif
-
-
-### upload license, list license, delete license
-
-When a license is uploaded, we'll persist it in a ConfigMap (kubernetes object) named license
-
-    curl -X PUT -F 'data=@/Users/adah/Downloads/TerracottaDB101.xml' http://localhost:8080/api/config/license
     
-    curl http://localhost:8080/api/config/license
-    
-    curl -X DELETE http://localhost:8080/api/config/license
+Delete the cluster: 
 
-### get info about Kubernetes cluster
-
-    curl http://localhost:8080/api/info
+    curl -X DELETE http://localhost:8080/api/cluster
 
 
 ## Interact with the operator, via kubectl and CRDs
 
-    kubectl --namespace=thisisatest  apply -f sample-yaml-files/1stripe-1node-cluster.yaml
+    kubectl --namespace=thisisatest  apply -f sample-yaml-files/1server-cluster.yaml
     
 and delete : 
 
-    kubectl --namespace=thisisatest  delete -f sample-yaml-files/1stripe-1node-cluster.yaml
+    kubectl --namespace=thisisatest  delete -f sample-yaml-files/1server-cluster.yaml
 
 
 ### few notes
