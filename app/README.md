@@ -1,4 +1,4 @@
-# Client
+  # Client
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.2.
 
@@ -23,6 +23,13 @@ Run `./ng test` to execute the unit tests via [Karma](https://karma-runner.githu
 ## Running end-to-end tests
 
 Run `./ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+
+# Backend
+
+When running the backend, you get all the REST services plugin the frontend available on
+`http://localhost:8080`.
+
+Run `./mvnw`
 
 ## Further help
 

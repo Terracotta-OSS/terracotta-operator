@@ -1,0 +1,4 @@
+#!/bin/sh
+cd $(dirname $0)
+PATH="$PWD/node/":$PATH
+node "node/yarn/dist/bin/yarn.js" "$@"
