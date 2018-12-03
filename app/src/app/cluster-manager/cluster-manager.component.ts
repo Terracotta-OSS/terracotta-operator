@@ -19,8 +19,6 @@ export class ClusterManagerComponent implements OnInit {
 
   @ViewChild('offheaps') offheaps: ElementRef;
 
-  @ViewChild('dataroots') dataroots: ElementRef;
-
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.createForm();
   }
@@ -31,7 +29,6 @@ export class ClusterManagerComponent implements OnInit {
 
   createForm() {
     this.form = this.fb.group({
-      clusterName: ['', Validators.required],
       stripes: [2],
       serversPerStripe: [2],
       clientReconnectWindow: [20]
@@ -40,21 +37,19 @@ export class ClusterManagerComponent implements OnInit {
 
   onSubmit() {
     this.loading = true;
-    const clusterName = this.form.get('clusterName').value;
-    this.http.post(SERVER_API_URL + `/api/cluster/${clusterName}`, {...this.form.value, ...this.assembleResourceMap()}).subscribe(resp => {
+    this.http.post(SERVER_API_URL + `/api/cluster`, {...this.form.value, ...this.assembleResourceMap()}).subscribe(resp => {
       this.loading = false;
-      this.showCluster(clusterName);
+      this.showCluster();
     }, err => { this.loading = false; });
   }
 
   fetchCluster() {
-    this.showCluster(this.form.get('clusterName').value);
+    this.showCluster();
   }
 
-  showCluster(clusterName: string) {
+  showCluster() {
     this.loading = true;
-    clusterName = clusterName ? clusterName : this.form.get('clusterName').value;
-    this.http.get(SERVER_API_URL + `/api/cluster/${clusterName}`).subscribe(resp => {
+    this.http.get(SERVER_API_URL + `/api/cluster`).subscribe(resp => {
       this.loading = false;
       this.clusterConfig = JSON.stringify(resp);
     }, err => { this.loading = false; });
@@ -62,14 +57,13 @@ export class ClusterManagerComponent implements OnInit {
 
   removeCluster() {
     this.loading = true;
-    const clusterName = this.form.get('clusterName').value;
-    this.http.delete(SERVER_API_URL + `/api/cluster/${clusterName}`).subscribe(resp => {
+    this.http.delete(SERVER_API_URL + `/api/cluster`).subscribe(resp => {
       this.loading = false;
     }, err => { this.loading = false; });
   }
 
   assembleResourceMap() {
-    const result = { offheaps: {}, dataroots: {}};
+    const result = { offheaps: {}};
     Array.from(this.offheaps.nativeElement.childNodes).forEach(li => {
       let name;
       let value;
@@ -86,24 +80,6 @@ export class ClusterManagerComponent implements OnInit {
       })
       result.offheaps[name] = value;
     });
-    Array.from(this.dataroots.nativeElement.children).forEach(li => {
-      let name;
-      let value;
-      // @ts-ignore
-      Array.from(li.children).forEach(child => {
-        // @ts-ignore
-        if (child.className === 'name') {
-          // @ts-ignore
-          name = child.value;
-        } else {
-          // @ts-ignore
-          value = child.value;
-        }
-      })
-      if (name && value) {
-        result.dataroots[name] = value;
-      }
-    });
     return result;
   }
 
@@ -114,15 +90,6 @@ export class ClusterManagerComponent implements OnInit {
       <input type="text" class="value" placeholder="256MB">`;
     frag.appendChild(li);
     this.offheaps.nativeElement.appendChild(frag);
-  }
-
-  addDataroot() {
-    var frag = document.createDocumentFragment();
-    var li = document.createElement("li");
-    li.innerHTML = `<input type="text" class="name" placeholder="dataroot1">
-      <input type="text" class="value" placeholder="local">`;
-    frag.appendChild(li);
-    this.dataroots.nativeElement.appendChild(frag);
   }
 
   removeResource() {

@@ -29,8 +29,7 @@ public class TheServiceTest {
 
 
     assertThat(tcConfigs.keySet(),equalTo(new HashSet<String>() {{
-      add("stripe-0.xml");
-      add("stripe-1.xml");
+      add("terracotta.xml");
     }}));
 
   }
@@ -60,6 +59,6 @@ public class TheServiceTest {
 
     TheService theService =  new TheService();
     String terracottaServerUrl = theService.constructTerracottaServerUrl(clusterConfig);
-    assertThat(terracottaServerUrl, equalTo("terracotta://terracotta-0-0.stripe-0:9410,terracotta-0-1.stripe-0:9410"));
+    assertThat(terracottaServerUrl, equalTo("terracotta://terracotta-0.terracotta:9410,terracotta-1.terracotta:9410"));
   }
 }

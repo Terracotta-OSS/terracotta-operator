@@ -1,9 +1,5 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <div class="form-group">
-    <label for="clusterName">Cluster Name</label>
-    <input type="text" class="form-control" id="clusterName" placeholder="MyCluster" formControlName="clusterName">
-    <label for="stripes">Number of stripes</label>
-    <input type="text" class="form-control" id="stripes" placeholder="2" formControlName="stripes">
     <label for="serversPerStripe">Servers per stripe</label>
     <input type="text" class="form-control" id="serversPerStripe" placeholder="2" formControlName="serversPerStripe">
     <label for="clientReconnectWindow">Reconnect Window</label>
@@ -12,10 +8,7 @@
     </ul>
     <button type="button" class="btn btn-sm btn-default" (click)="addOffheap()">Add</button>
     <button type="button" class="btn btn-sm btn-default" (click)="removeOffheap()">Remove</button>
-    <ul class="dataroots" #dataroots>
-    </ul>
-    <button type="button" class="btn btn-sm btn-default" (click)="addDataroot()">Add</button>
-    <button type="button" class="btn btn-sm btn-default" (click)="removeDataroot()">Remove</button>
+
   </div>
   <button type="submit" [disabled]="form.invalid || loading" class="btn btn-success">Create Cluster <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loading"></i></button>
   <button type="button" (click)="removeCluster()" [disabled]="form.invalid || loading" class="btn btn-failure">Remove Cluster <i class="fa fa-spinner fa-spin fa-fw" *ngIf="loading"></i></button>

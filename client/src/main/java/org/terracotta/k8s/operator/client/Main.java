@@ -1,7 +1,6 @@
 package org.terracotta.k8s.operator.client;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.terracotta.k8s.operator.shared.ClusterInfo;
@@ -15,9 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
 
 /**
  * @author Henri Tremblay
@@ -49,9 +45,6 @@ public class Main {
         System.out.println("2- Get cluster info");
         System.out.println("3- Create deployment");
         System.out.println("4- Delete deployment");
-        System.out.println("5- Add license");
-        System.out.println("6- Delete license");
-        System.out.println("7- Read license");
         // Add more choices here
         System.out.println("x- Exit");
 
@@ -70,15 +63,6 @@ public class Main {
           case "4":
             deleteDeployment();
             break;
-          case "5":
-            createLicense();
-            break;
-          case "6":
-            deleteLicense();
-            break;
-          case "7":
-            readLicense();
-            break;
           case "x":
             return;
           default:
@@ -90,32 +74,11 @@ public class Main {
     }
   }
 
-  private static void readLicense() {
-    try {
-      ResponseEntity<String> response = template.getForEntity(server + "/api/config/license", String.class);
-      System.out.println(response.getBody());
-    } catch(HttpClientErrorException e) {
-      System.out.println(e.getResponseBodyAsString());
-    }
-  }
-
-  private static void deleteLicense() {
-    template.delete(server + "/api/config/license");
-  }
-
-  private static void createLicense() throws IOException {
-    String filePath = readString("Enter path to licence file:");
-    byte[] content = Files.readAllBytes(Paths.get(filePath));
-    template.put(server + "/api/config/license", Base64.getEncoder().encodeToString(content));
-  }
-
   private static void deleteDeployment() throws IOException {
-    String clusterName = readString("Enter cluster name to delete:");
-    template.delete(server + "/api/cluster/{clusterName}", clusterName);
+    template.delete(server + "/api/cluster");
   }
 
   private static void createDeployment() throws IOException {
-    String clusterName = readString("Enter cluster name to create:");
     TerracottaClusterConfiguration conf = new TerracottaClusterConfiguration();
 
     while(true) {
@@ -133,8 +96,8 @@ public class Main {
     conf.setServersPerStripe(serversPerStripe);
     conf.setClientReconnectWindow(clientReconnectWindow);
 
-    ResponseEntity<String> response = template.postForEntity(server + "/api/cluster/{clusterName}", conf, String.class, clusterName);
-    System.out.println("TMC URL: " + response.getBody());
+    ResponseEntity<String> response = template.postForEntity(server + "/api/cluster", conf, String.class);
+    System.out.println("Terracotta Cluster URL: " + response.getBody());
   }
 
   private static void getClusterInfo() {
